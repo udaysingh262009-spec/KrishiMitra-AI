@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Language } from '../App';
+import { API_BASE_URL } from '../config';
 
 interface ProfileProps {
   userName: string;
@@ -177,7 +178,7 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
 
   const fetchScanCount = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/scans');
+      const res = await fetch(`${API_BASE_URL}/api/scans`);
       if (res.ok) {
         const data = await res.json();
         setScanCount(data.length || 0);
@@ -191,8 +192,8 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
     try {
       const cachedEmail = localStorage.getItem('km_user_email') || email;
       const url = cachedEmail 
-        ? `http://localhost:8000/api/profile?email=${encodeURIComponent(cachedEmail)}`
-        : 'http://localhost:8000/api/profile';
+        ? `${API_BASE_URL}/api/profile?email=${encodeURIComponent(cachedEmail)}`
+        : `${API_BASE_URL}/api/profile`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -224,8 +225,8 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
 
     try {
       const url = email.trim()
-        ? `http://localhost:8000/api/profile?email=${encodeURIComponent(email.trim())}`
-        : 'http://localhost:8000/api/profile';
+        ? `${API_BASE_URL}/api/profile?email=${encodeURIComponent(email.trim())}`
+        : `${API_BASE_URL}/api/profile`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

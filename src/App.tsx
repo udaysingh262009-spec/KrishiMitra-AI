@@ -6,6 +6,7 @@ import { ChatAssistant } from './components/ChatAssistant';
 import { Profile } from './components/Profile';
 import { WeatherPage } from './components/WeatherPage';
 import { SplashScreen } from './components/SplashScreen';
+import { API_BASE_URL } from './config';
 
 export type Tab = 'dashboard' | 'weather' | 'diagnostics' | 'chat' | 'profile';
 export type Language = 'en' | 'hi' | 'pb' | 'mr' | 'bn';
@@ -213,7 +214,7 @@ const App: React.FC = () => {
     if (isLoggedIn) {
       const loadProfile = async () => {
         try {
-          const res = await fetch('http://localhost:8000/api/profile');
+          const res = await fetch(`${API_BASE_URL}/api/profile`);
           if (res.ok) {
             const data = await res.json();
             if (data.name) setUserName(data.name);
@@ -243,7 +244,7 @@ const App: React.FC = () => {
           localStorage.setItem('km_user_state', state);
           localStorage.setItem('km_user_email', email);
           try {
-            await fetch('http://localhost:8000/api/profile', {
+            await fetch(`${API_BASE_URL}/api/profile`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -580,7 +581,7 @@ const App: React.FC = () => {
                   
                   // 2. Reset backend SQLite profile to blank defaults
                   try {
-                    await fetch('http://localhost:8000/api/profile/reset', { method: 'POST' });
+                    await fetch(`${API_BASE_URL}/api/profile/reset`, { method: 'POST' });
                   } catch (e) {
                     console.warn("Could not reset database profile on logout:", e);
                   }

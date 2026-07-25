@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Language } from '../App';
+import { API_BASE_URL } from '../config';
 
 interface HistoryPageProps {
   language: Language;
@@ -190,7 +191,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ language }) => {
   const fetchHistoryData = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/history/${activeTab}`);
+      const res = await fetch(`${API_BASE_URL}/api/history/${activeTab}`);
       if (res.ok) {
         const data = await res.json();
         if (activeTab === 'chat') setChatList(data);
@@ -209,7 +210,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ language }) => {
   // Chat actions
   const handleDeleteChat = async (id: number) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/history/chat/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/api/history/chat/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setChatList(prev => prev.filter(c => c.id !== id));
       }
@@ -221,7 +222,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ language }) => {
   const handleClearAllChats = async () => {
     if (!window.confirm(t.clearAll + "?")) return;
     try {
-      const res = await fetch('http://localhost:8000/api/history/chat', { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/api/history/chat`, { method: 'DELETE' });
       if (res.ok) {
         setChatList([]);
       }
@@ -233,7 +234,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ language }) => {
   // Voice actions
   const handleDeleteVoice = async (id: number) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/history/voice/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/api/history/voice/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setVoiceList(prev => prev.filter(v => v.id !== id));
       }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Language } from '../App';
+import { API_BASE_URL } from '../config';
 import { INDIAN_STATES_DISTRICTS } from '../utils/indianStatesData';
 
 // Helper function to return dynamic styles based on weather condition
@@ -268,7 +269,7 @@ export const WeatherPage: React.FC<WeatherPageProps> = ({ userState, language })
         setLoading(true);
         setErrorMsg('');
         try {
-          const res = await fetch(`http://localhost:8000/api/weather?state=${encodeURIComponent(selectedState)}&district=${encodeURIComponent(selectedDistrict)}`);
+          const res = await fetch(`${API_BASE_URL}/api/weather?state=${encodeURIComponent(selectedState)}&district=${encodeURIComponent(selectedDistrict)}`);
           if (res.ok) {
             const data = await res.json();
             setWeather(data);
@@ -278,7 +279,7 @@ export const WeatherPage: React.FC<WeatherPageProps> = ({ userState, language })
             
             // Log to SQLite weather history
             try {
-              fetch('http://localhost:8000/api/history/weather', {
+              fetch(`${API_BASE_URL}/api/history/weather`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -317,7 +318,7 @@ export const WeatherPage: React.FC<WeatherPageProps> = ({ userState, language })
     setLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/weather?state=${encodeURIComponent(selectedState)}&district=${encodeURIComponent(selectedDistrict)}`);
+      const res = await fetch(`${API_BASE_URL}/api/weather?state=${encodeURIComponent(selectedState)}&district=${encodeURIComponent(selectedDistrict)}`);
       if (res.ok) {
         const data = await res.json();
         setWeather(data);
@@ -329,7 +330,7 @@ export const WeatherPage: React.FC<WeatherPageProps> = ({ userState, language })
 
         // Log to SQLite weather history
         try {
-          fetch('http://localhost:8000/api/history/weather', {
+          fetch(`${API_BASE_URL}/api/history/weather`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

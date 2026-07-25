@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Language } from '../App';
+import { API_BASE_URL, getWebSocketUrl } from '../config';
 import { AudioStreamProcessor } from '../utils/audioProcessor';
 
 interface Message {
@@ -691,7 +692,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
     }
     
     try {
-      const res = await fetch('http://localhost:8000/api/synthesize', {
+      const res = await fetch(`${API_BASE_URL}/api/synthesize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: msg.text })
@@ -740,7 +741,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
     setIsTyping(true);
 
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -770,7 +771,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
     } catch (err) {
       setIsTyping(false);
       const errorMsg = language === 'en' 
-        ? 'Could not connect to the Python backend. Please ensure uvicorn main:app is running on http://localhost:8000.'
+        ? `Could not connect to the Python backend (${API_BASE_URL}). Please ensure uvicorn main:app is running.`
         : 'ਪਾਇਥਨ ਬੈਕਐਂਡ ਨਾਲ ਕਨੈਕਟ ਨਹੀਂ ਹੋ ਸਕਿਆ।';
       
       setMessages(prev => [...prev, {
@@ -834,7 +835,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
     setMessages(prev => [...prev, userMsg]);
     
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: spokenText })
@@ -931,7 +932,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
             const base64Audio = (reader.result as string);
             
             try {
-              const res = await fetch('http://localhost:8000/api/voice-chat', {
+              const res = await fetch(`${API_BASE_URL}/api/voice-chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1079,10 +1080,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
       const processor = new AudioStreamProcessor();
       audioProcessorRef.current = processor;
 
-      console.log("Establishing WebSocket connection...");
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.hostname || 'localhost';
-      const wsUrl = `${protocol}//${host}:8000/api/ws/voice?lang=${language}`;
+      const wsUrl = getWebSocketUrl(`/api/ws/voice?lang=${language}`);
       console.log("WebSocket Connection target:", wsUrl);
       
       const ws = new WebSocket(wsUrl);

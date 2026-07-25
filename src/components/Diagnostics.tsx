@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { Language } from '../App';
+import { API_BASE_URL } from '../config';
 
 interface SavedReport {
   id: string;
@@ -427,7 +428,7 @@ export const Diagnostics: React.FC<DiagnosticsProps> = ({ language }) => {
 
   const fetchScans = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/scans');
+      const res = await fetch(`${API_BASE_URL}/api/scans`);
       if (res.ok) {
         const data = await res.json();
         setReports(data);
@@ -476,7 +477,7 @@ export const Diagnostics: React.FC<DiagnosticsProps> = ({ language }) => {
 
       const base64Image = await getBase64(file);
 
-      const res = await fetch('http://localhost:8000/api/scan', {
+      const res = await fetch(`${API_BASE_URL}/api/scan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -582,7 +583,7 @@ export const Diagnostics: React.FC<DiagnosticsProps> = ({ language }) => {
     const chemical = chemicalRemedies.length > 0 ? chemicalRemedies : ['No chemical remedies added.'];
 
     try {
-      const res = await fetch('http://localhost:8000/api/scan-log', {
+      const res = await fetch(`${API_BASE_URL}/api/scan-log`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -598,7 +599,7 @@ export const Diagnostics: React.FC<DiagnosticsProps> = ({ language }) => {
 
       // SQLite disease_history persistence log
       try {
-        await fetch('http://localhost:8000/api/history/disease', {
+        await fetch(`${API_BASE_URL}/api/history/disease`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -636,7 +637,7 @@ export const Diagnostics: React.FC<DiagnosticsProps> = ({ language }) => {
       const prevDisease = disease;
       setDisease(language === 'hi' ? 'अनुवाद हो रहा है...' : 'Translating...');
       
-      const res = await fetch('http://localhost:8000/api/translate-report', {
+      const res = await fetch(`${API_BASE_URL}/api/translate-report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
