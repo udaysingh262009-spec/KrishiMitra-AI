@@ -432,7 +432,7 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
       </div>
 
       {/* 2. MAIN LAYOUT GRID */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(330px, 400px) 1fr', gap: '2.5rem' }} className="grid-responsive-layout">
+      <div className="grid-responsive-layout">
         
         {/* Left Side Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

@@ -1301,7 +1301,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
   };
 
   return (
-    <div className="fade-in" style={{ display: 'flex', gap: '1.25rem', flexWrap: 'nowrap', alignItems: 'stretch', height: 'calc(100vh - 12rem)', position: 'relative' }}>
+    <div className="fade-in chat-assistant-wrapper" style={{ display: 'flex', gap: '1rem', flexWrap: 'nowrap', alignItems: 'stretch', width: '100%', minHeight: '0', flexGrow: 1, position: 'relative' }}>
       
       {/* Inject custom styles for the fluid organic visualizer */}
       <style>{`
@@ -1375,7 +1375,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
       `}</style>
 
       {/* Left Pane: Collapsible History Sidebar Slider (ChatGPT style) */}
-      <div className="glass-card" style={{
+      <div className="glass-card chat-history-sidebar" style={{
         flex: isSidebarOpen ? '0 0 270px' : '0 0 0px',
         width: isSidebarOpen ? '270px' : '0px',
         opacity: isSidebarOpen ? 1 : 0,
@@ -1449,7 +1449,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.25s ease',
                     boxShadow: isActive ? '0 2px 8px rgba(46, 204, 113, 0.15)' : 'none'
                   }}
                   className="history-session-item"
@@ -1500,11 +1500,14 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
       </div>
 
       {/* Right/Main Pane: Active Chat Box */}
-      <div className="glass-card" style={{
-        flex: '1 1 500px',
+      <div className="glass-card chat-main-pane" style={{
+        flex: '1 1 300px',
+        width: '100%',
+        maxWidth: '100%',
+        minWidth: '0',
         display: 'flex',
         flexDirection: 'column',
-        padding: '1.25rem',
+        padding: '1.15rem',
         justifyContent: 'space-between',
         gap: '1rem',
         position: 'relative'

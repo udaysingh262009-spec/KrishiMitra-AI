@@ -1293,6 +1293,57 @@ body {
   }
 }
 
+/* Responsive Grid Layout for Profile */
+.grid-responsive-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 2rem;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .grid-responsive-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+}
+
+/* Chat Assistant & Profile Mobile Responsive Overhaul */
+@media (max-width: 768px) {
+  .chat-assistant-wrapper {
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: calc(100dvh - 170px) !important;
+    position: relative !important;
+  }
+
+  .chat-history-sidebar {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    z-index: 50 !important;
+    width: 85% !important;
+    max-width: 300px !important;
+    background: var(--bg-surface-solid) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.75) !important;
+  }
+
+  .chat-main-pane {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+    padding: 0.85rem !important;
+  }
+
+  .profile-container {
+    padding: 0.25rem !important;
+    padding-bottom: 2rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
 /* Material Design 3 Bottom Sheet animations */
 @keyframes slideUp {
   from {
