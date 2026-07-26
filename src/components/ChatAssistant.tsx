@@ -731,6 +731,16 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
   const handleSend = async (textToSend: string) => {
     if (!textToSend.trim() && !attachedImage) return;
 
+    // Immediately stop any active speech synthesis or audio playback for text chat
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch(e) {}
+    }
+    const currentAudio = (window as any)._currentAudioPlayback;
+    if (currentAudio) {
+      try { currentAudio.pause(); } catch(e) {}
+      (window as any)._currentAudioPlayback = null;
+    }
+
     // Capture dynamic image attachments
     const currentImage = attachedImage;
     const currentMime = attachedMimeType;
