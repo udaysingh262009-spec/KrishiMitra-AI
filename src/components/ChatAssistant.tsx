@@ -1704,12 +1704,12 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
                     background: msg.sender === 'user' ? 'var(--primary)' : 'var(--bg-surface-elevated)',
                     color: msg.sender === 'user' ? 'var(--bg-base)' : 'var(--text-primary)',
                     border: msg.sender === 'user' ? 'none' : '1px solid var(--border-color)',
-                    padding: '1rem 1.35rem',
+                    padding: '0.75rem 1rem',
                     borderRadius: msg.sender === 'user' 
                       ? '16px 16px 2px 16px' 
                       : '16px 16px 16px 2px',
-                    fontSize: '1.2rem',
-                    lineHeight: 1.6,
+                    fontSize: '0.95rem',
+                    lineHeight: 1.5,
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                     whiteSpace: 'pre-wrap'
                   }}
@@ -1916,7 +1916,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
                 background: 'transparent',
                 outline: 'none',
                 color: 'var(--text-primary)',
-                fontSize: '1.05rem',
+                fontSize: '0.92rem',
                 padding: '0.35rem 0.15rem'
               }}
             />
