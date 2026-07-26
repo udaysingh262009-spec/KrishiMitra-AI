@@ -257,7 +257,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
   });
 
   // UI state states
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth > 768);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -1756,7 +1756,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
         {messages.length === 1 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 650 }}>{t.queries}</span>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
               {t.suggestions.map((sug: string, i: number) => (
                 <button 
                   key={i} 
