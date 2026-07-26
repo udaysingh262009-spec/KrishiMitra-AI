@@ -962,6 +962,18 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
                                     botReply.toLowerCase().includes('quota exceeded') ||
                                     botReply.toLowerCase().includes('too many requests');
 
+              // If empty transcript or background silence, silently resume listening without looping
+              if (!transcript || !botReply) {
+                if (isCallActiveRef.current && !isMutedRef.current) {
+                  setCallState('listening');
+                  setLiveTranscript(language === 'hi' ? '🎤 बोलिए...' : '🎤 Listening...');
+                  setTimeout(() => {
+                    if (isCallActiveRef.current && !isMutedRef.current) startRecordingCycle();
+                  }, 800);
+                }
+                return;
+              }
+
               // Show user's spoken text
               if (transcript) {
                 setMessages(prev => [...prev, {
@@ -1000,14 +1012,19 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
                 audio: data.audio || ''
               }]);
 
-              // Speak the detailed reply aloud (only if it's a valid response, not an error)
+              // Speak the detailed reply aloud (only if call is active)
               if (isCallActiveRef.current) {
                 speakText(botReply, () => {
+                  if (!isCallActiveRef.current) return;
                   setCallState('listening');
-                  setLiveTranscript('');
-                  // Start next recording cycle after a pause
+                  setLiveTranscript(language === 'hi' ? '🎤 बोलिए...' : '🎤 Listening...');
+                  // Start next recording cycle after a 2.5s buffer so speaker echo dies down completely
                   if (isCallActiveRef.current && !isMutedRef.current) {
-                    setTimeout(() => startRecordingCycle(), 2000);
+                    setTimeout(() => {
+                      if (isCallActiveRef.current && !isMutedRef.current) {
+                        startRecordingCycle();
+                      }
+                    }, 2500);
                   }
                 }, data.audio || '');
               }
@@ -1205,6 +1222,16 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
     setLiveTranscript('');
     liveTranscriptRef.current = '';
 
+    // Stop active audio playback & speech synthesis
+    const currentAudio = (window as any)._currentAudioPlayback;
+    if (currentAudio) {
+      try { currentAudio.pause(); } catch(e) {}
+      (window as any)._currentAudioPlayback = null;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
     if (wsRef.current) {
       try { wsRef.current.close(); } catch(e) {}
       wsRef.current = null;
@@ -1234,18 +1261,6 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
     if (voiceStream) {
       voiceStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
       (window as any)._voiceStream = null;
-    }
-
-    // Stop native audio playback if active
-    const currentAudio = (window as any)._currentAudioPlayback;
-    if (currentAudio) {
-      try { currentAudio.pause(); } catch(e) {}
-      (window as any)._currentAudioPlayback = null;
-    }
-
-    // Cancel any active Speech Synthesis
-    if ('speechSynthesis' in window) {
-      try { window.speechSynthesis.cancel(); } catch(e) {}
     }
   };
 

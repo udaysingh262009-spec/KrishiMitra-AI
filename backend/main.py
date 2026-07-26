@@ -1025,14 +1025,14 @@ async def voice_chat(request: VoiceChatRequest):
     }.get(request.language, "Hindi")
 
     prompt = (
-        f"You are KrishiMitra, a friendly Indian agriculture voice assistant. "
-        f"The user has sent you an audio message. First, transcribe exactly what they said. "
-        f"Then give a detailed, helpful agricultural response as if speaking on a phone call. "
-        f"Speak naturally like a knowledgeable farmer friend. Give full explanation with remedies and tips. "
-        f"Do NOT use bullet points, lists, stars, markdown or any formatting - just plain spoken sentences. "
-        f"Also provide a short 1-line summary of your answer. "
+        f"You are KrishiMitra, an expert Indian agriculture AI voice assistant. "
+        f"The user has sent an audio recording. Transcribe their words exactly in 'transcript'. "
+        f"If the audio is silent or un-understandable background noise, set 'transcript': '' and 'response': ''. "
+        f"If a real question is asked, give a clear, direct, and practical agricultural solution in 2-3 spoken sentences. "
+        f"Speak warmly and naturally like a helpful farmer friend. "
+        f"Do NOT use bullet points, lists, stars, markdown or any formatting. "
         f"Respond in {lang_name} language. "
-        f"Format as JSON with keys: 'transcript', 'response' (full spoken answer), and 'summary' (1-line short text). "
+        f"Format strictly as JSON with keys: 'transcript', 'response' (2-3 sentence clear spoken answer), and 'summary' (1-line short summary). "
         f"Respond ONLY with valid JSON."
     )
 
@@ -1060,17 +1060,20 @@ async def voice_chat(request: VoiceChatRequest):
         else:
             result = json.loads(text_clean)
         
-        transcript = result.get("transcript", "")
-        reply = result.get("response", response_text)
-        summary = result.get("summary", reply)
+        transcript = result.get("transcript", "").strip()
+        reply = result.get("response", response_text).strip()
+        summary = result.get("summary", reply).strip()
         
+        if not transcript or not reply:
+            return {"transcript": "", "response": "", "summary": "", "audio": ""}
+
         # Save to chat history
         try:
             database.insert_chat_history(1, f"[Voice] {transcript}", summary)
         except Exception:
             pass
         
-        audio_b64 = synthesize_text_to_speech(gemini_key, summary)
+        audio_b64 = synthesize_text_to_speech(gemini_key, summary or reply)
         
         return {"transcript": transcript, "response": reply, "summary": summary, "audio": audio_b64}
     except Exception as e:
