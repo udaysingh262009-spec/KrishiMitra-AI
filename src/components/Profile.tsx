@@ -148,7 +148,7 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
   const [phone, setPhone] = useState('');
   const [farmSize, setFarmSize] = useState('4.5');
   const [mainCrops, setMainCrops] = useState('Wheat');
-  const [photoUrl, setPhotoUrl] = useState('https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&q=80&w=200&h=200');
+  const [photoUrl, setPhotoUrl] = useState(() => localStorage.getItem('km_user_photo_url') || 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&q=80&w=200&h=200');
 
   // Background state values
   const [stateVal, setStateVal] = useState(userState);
@@ -202,7 +202,15 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
         setPhone(data.phone || '');
         setFarmSize(String(data.farm_size || data.farmSize || '4.5'));
         setMainCrops(data.main_crops || data.mainCrops || 'Wheat');
-        setPhotoUrl(data.photo_url || data.photoUrl || 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&q=80&w=200&h=200');
+        
+        const localPhoto = localStorage.getItem('km_user_photo_url');
+        const fetchedPhoto = data.photo_url || data.photoUrl;
+        if (localPhoto && localPhoto.trim().length > 10) {
+          setPhotoUrl(localPhoto);
+        } else if (fetchedPhoto && fetchedPhoto.trim().length > 10) {
+          setPhotoUrl(fetchedPhoto);
+          try { localStorage.setItem('km_user_photo_url', fetchedPhoto); } catch (e) {}
+        }
         
         if (data.email) {
           localStorage.setItem('km_user_email', data.email);
@@ -246,6 +254,9 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
       if (res.ok) {
         onUpdate(name, stateVal);
         localStorage.setItem('km_user_email', email.trim());
+        if (photoUrl) {
+          try { localStorage.setItem('km_user_photo_url', photoUrl); } catch (e) {}
+        }
         setIsEditMode(false);
         showToast(t.successMsg, 'success');
       } else {
@@ -263,7 +274,9 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhotoUrl(reader.result as string);
+        const base64 = reader.result as string;
+        setPhotoUrl(base64);
+        try { localStorage.setItem('km_user_photo_url', base64); } catch (e) {}
         setIsEditMode(true);
       };
       reader.readAsDataURL(file);
@@ -295,7 +308,9 @@ export const Profile: React.FC<ProfileProps> = ({ userName, userState, onUpdate,
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(videoRef.current, 0, 0, 300, 300);
-        setPhotoUrl(canvas.toDataURL('image/jpeg'));
+        const base64 = canvas.toDataURL('image/jpeg');
+        setPhotoUrl(base64);
+        try { localStorage.setItem('km_user_photo_url', base64); } catch (e) {}
       }
       stopCamera();
     }
