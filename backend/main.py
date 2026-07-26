@@ -1052,33 +1052,55 @@ async def voice_chat(request: VoiceChatRequest):
         }
         response_text = call_gemini_rest_api(gemini_key, payload)
         
-        # Parse JSON response
+        # Parse JSON or raw text response robustly
         text_clean = response_text.strip()
-        json_match = re.search(r'(\{.*\})', text_clean, re.DOTALL)
-        if json_match:
-            result = json.loads(json_match.group(1))
-        else:
-            result = json.loads(text_clean)
-        
-        transcript = result.get("transcript", "").strip()
-        reply = result.get("response", response_text).strip()
-        summary = result.get("summary", reply).strip()
-        
-        if not transcript or not reply:
-            return {"transcript": "", "response": "", "summary": "", "audio": ""}
+        transcript = ""
+        reply = ""
+        summary = ""
+
+        try:
+            json_match = re.search(r'(\{.*\})', text_clean, re.DOTALL)
+            if json_match:
+                result = json.loads(json_match.group(1))
+            else:
+                result = json.loads(text_clean)
+
+            if isinstance(result, dict):
+                transcript = str(result.get("transcript") or result.get("user_speech") or result.get("input") or "Voice Query").strip()
+                reply = str(result.get("response") or result.get("answer") or result.get("reply") or text_clean).strip()
+                summary = str(result.get("summary") or reply).strip()
+        except Exception:
+            # Fallback if Gemini outputs plain text response directly
+            reply = text_clean
+            transcript = "Voice Query"
+            summary = reply[:150]
+
+        if not reply or len(reply.strip()) == 0:
+            reply = "I am listening. Please ask your question clearly."
+            transcript = "Voice Question"
+            summary = reply
+
+        # Clean markdown formatting for voice
+        clean_reply = re.sub(r'\*\*|###|##|#|\*', '', reply).strip()
+        clean_summary = re.sub(r'\*\*|###|##|#|\*', '', summary).strip()
 
         # Save to chat history
         try:
-            database.insert_chat_history(1, f"[Voice] {transcript}", summary)
+            database.insert_chat_history(1, f"[Voice] {transcript}", clean_summary)
         except Exception:
             pass
         
-        audio_b64 = synthesize_text_to_speech(gemini_key, summary or reply)
+        audio_b64 = synthesize_text_to_speech(gemini_key, clean_summary or clean_reply)
         
-        return {"transcript": transcript, "response": reply, "summary": summary, "audio": audio_b64}
+        return {
+            "transcript": transcript, 
+            "response": clean_reply, 
+            "summary": clean_summary, 
+            "audio": audio_b64
+        }
     except Exception as e:
         print(f"Voice chat Gemini API error: {str(e)}", flush=True)
-        return {"transcript": "", "response": f"Voice processing error: {str(e)}", "summary": "Error"}
+        return {"transcript": "Voice Query", "response": "Sorry, I had trouble understanding. Please try asking again.", "summary": "Error", "audio": ""}
 
 @app.post("/api/scan")
 async def scan_leaf(request: ScanRequest):

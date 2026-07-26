@@ -962,8 +962,8 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
                                     botReply.toLowerCase().includes('quota exceeded') ||
                                     botReply.toLowerCase().includes('too many requests');
 
-              // If empty transcript or background silence, silently resume listening without looping
-              if (!transcript || !botReply) {
+              // If empty response, silently resume listening
+              if (!botReply || botReply.trim() === '') {
                 if (isCallActiveRef.current && !isMutedRef.current) {
                   setCallState('listening');
                   setLiveTranscript(language === 'hi' ? '🎤 बोलिए...' : '🎤 Listening...');
