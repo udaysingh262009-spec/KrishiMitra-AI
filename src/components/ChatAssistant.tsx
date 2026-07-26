@@ -300,6 +300,13 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
     isCallActiveRef.current = isCallActive;
   }, [isCallActive]);
 
+  // Auto-scroll to bottom whenever messages or typing indicator changes
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isTyping]);
+
   useEffect(() => {
     isMutedRef.current = isMuted;
   }, [isMuted]);
@@ -1409,9 +1416,30 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
           <span>➕</span> {t.newChat}
         </button>
 
-        {/* Sidebar Title */}
-        <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginTop: '0.25rem' }}>
-          <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>📁 {t.historyTitle}</h4>
+        {/* Sidebar Title Header with Close Button */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginTop: '0.25rem' }}>
+          <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>📁 {t.historyTitle}</h4>
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)',
+              borderRadius: '50%',
+              width: '28px',
+              height: '28px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              transition: 'all 0.2s ease'
+            }}
+            title="Close History Sidebar"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Sessions Feed list */}
@@ -1772,14 +1800,14 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
         )}
 
         {/* Modern ChatGPT-inspired Input conductor */}
-        <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem', width: '100%', flexShrink: 0, marginTop: 'auto' }}>
           
           {/* Left side attachment plus icon button */}
           <button
             onClick={() => setShowAttachmentMenu(true)}
             style={{
-              width: '42px',
-              height: '42px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
               background: 'rgba(255, 255, 255, 0.05)',
               border: '1px solid var(--border-color)',
@@ -1864,13 +1892,14 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
           {/* Pill-shaped Rounded Input Conductor */}
           <div style={{
             flexGrow: 1,
+            minWidth: 0,
             display: 'flex',
             alignItems: 'center',
             background: 'rgba(255, 255, 255, 0.04)',
             border: '1px solid var(--border-color)',
             borderRadius: '26px',
-            padding: '0.35rem 0.65rem 0.35rem 1.25rem',
-            gap: '0.5rem',
+            padding: '0.25rem 0.4rem 0.25rem 0.85rem',
+            gap: '0.35rem',
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
           }}>
             {/* Input field */}
@@ -1882,12 +1911,13 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ language }) => {
               onKeyDown={(e) => { if (e.key === 'Enter') handleSend(input); }}
               style={{
                 flexGrow: 1,
+                minWidth: '50px',
                 border: 'none',
                 background: 'transparent',
                 outline: 'none',
                 color: 'var(--text-primary)',
-                fontSize: '1.2rem',
-                padding: '0.5rem 0.25rem'
+                fontSize: '1.05rem',
+                padding: '0.35rem 0.15rem'
               }}
             />
 
